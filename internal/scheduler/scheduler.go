@@ -80,7 +80,7 @@ func New(opts ...OptionFn) (*Scheduler, error) {
 	// TODO: Add configurable duration.
 	job, err := s.srv.NewJob(
 		gocron.DurationJob(
-			5*time.Minute,
+			24*time.Hour,
 		),
 		gocron.NewTask(
 			checkCertsJob,
