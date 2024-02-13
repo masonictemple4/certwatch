@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/masoncitemple4/certwatch/internal/emails"
@@ -29,6 +30,17 @@ func checkCert(srv *Scheduler, hostname, port string) {
 	}
 
 	certResult := validator.Verify(hostname, port)
+
+	if len(certResult.Errors) > 0 {
+		errStrList := make([]string, len(certResult.Errors))
+		for i, err := range certResult.Errors {
+			errStrList[i] = err.Error()
+		}
+		srv.logger.Error("cert check failed", slog.String("hostname", hostname), slog.String("errors", strings.Join(errStrList, ", ")))
+		// TODO: Add some sort of retry mechanism
+		// Don't check in IsValid because there are things like DNS errors that are not the cert's fault
+		return
+	}
 
 	previewStr := certResult.PreviewString()
 
